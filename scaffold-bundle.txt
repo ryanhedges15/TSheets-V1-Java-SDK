@@ -1,0 +1,241 @@
+#BEGIN_FILE: pom.xml
+<?xml version="1.0" encoding="UTF-8"?>
+<project xmlns="http://maven.apache.org/POM/4.0.0"
+         xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+    <modelVersion>4.0.0</modelVersion>
+
+    <parent>
+        <groupId>org.springframework.boot</groupId>
+        <artifactId>spring-boot-starter-parent</artifactId>
+        <version>2.7.18</version>
+        <relativePath/>
+    </parent>
+
+    <groupId>com.intuit.tsheets</groupId>
+    <artifactId>tsheets-parent</artifactId>
+    <version>0.0.1-SNAPSHOT</version>
+    <packaging>pom</packaging>
+    <name>TSheets Parent</name>
+    <description>Parent for the TSheets Spring Boot multi-module project</description>
+
+    <modules>
+        <module>tsheets-core</module>
+        <module>tsheets-examples</module>
+        <module>tsheets-tests</module>
+    </modules>
+
+    <properties>
+        <java.version>11</java.version>
+        <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
+    </properties>
+
+    <dependencyManagement>
+        <dependencies>
+            <dependency>
+                <groupId>com.fasterxml.jackson.datatype</groupId>
+                <artifactId>jackson-datatype-jsr310</artifactId>
+                <version>2.17.2</version>
+            </dependency>
+        </dependencies>
+    </dependencyManagement>
+</project>
+#END_FILE
+
+#BEGIN_FILE: tsheets-core/pom.xml
+<?xml version="1.0" encoding="UTF-8"?>
+<project xmlns="http://maven.apache.org/POM/4.0.0"
+         xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+    <modelVersion>4.0.0</modelVersion>
+
+    <parent>
+        <groupId>com.intuit.tsheets</groupId>
+        <artifactId>tsheets-parent</artifactId>
+        <version>0.0.1-SNAPSHOT</version>
+    </parent>
+
+    <artifactId>tsheets-core</artifactId>
+    <name>TSheets Core</name>
+    <description>Core library for TSheets Spring Boot SDK</description>
+
+    <dependencies>
+        <dependency>
+            <groupId>org.springframework.boot</groupId>
+            <artifactId>spring-boot-starter-web</artifactId>
+        </dependency>
+
+        <dependency>
+            <groupId>org.springframework.boot</groupId>
+            <artifactId>spring-boot-configuration-processor</artifactId>
+            <optional>true</optional>
+        </dependency>
+
+        <dependency>
+            <groupId>com.fasterxml.jackson.datatype</groupId>
+            <artifactId>jackson-datatype-jsr310</artifactId>
+        </dependency>
+    </dependencies>
+
+</project>
+#END_FILE
+
+#BEGIN_FILE: tsheets-core/src/main/java/com/intuit/tsheets/config/DataServiceProperties.java
+package com.intuit.tsheets.config;
+
+import org.springframework.boot.context.properties.ConfigurationProperties;
+
+@ConfigurationProperties("tsheets")
+public class DataServiceProperties {
+
+    private String baseUrl;
+    private String authToken;
+    private Long managedClientId;
+
+    public String getBaseUrl() {
+        return baseUrl;
+    }
+
+    public void setBaseUrl(String baseUrl) {
+        this.baseUrl = baseUrl;
+    }
+
+    public String getAuthToken() {
+        return authToken;
+    }
+
+    public void setAuthToken(String authToken) {
+        this.authToken = authToken;
+    }
+
+    public Long getManagedClientId() {
+        return managedClientId;
+    }
+
+    public void setManagedClientId(Long managedClientId) {
+        this.managedClientId = managedClientId;
+    }
+}
+#END_FILE
+
+#BEGIN_FILE: tsheets-core/src/main/java/com/intuit/tsheets/config/CoreAutoConfiguration.java
+package com.intuit.tsheets.config;
+
+import org.springframework.boot.context.properties.EnableConfigurationProperties;
+import org.springframework.context.annotation.Configuration;
+
+@Configuration
+@EnableConfigurationProperties(DataServiceProperties.class)
+public class CoreAutoConfiguration {
+}
+#END_FILE
+
+#BEGIN_FILE: tsheets-core/src/main/resources/META-INF/spring.factories
+org.springframework.boot.autoconfigure.EnableAutoConfiguration=\
+com.intuit.tsheets.config.CoreAutoConfiguration
+#END_FILE
+
+#BEGIN_FILE: tsheets-examples/pom.xml
+<?xml version="1.0" encoding="UTF-8"?>
+<project xmlns="http://maven.apache.org/POM/4.0.0"
+         xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+    <modelVersion>4.0.0</modelVersion>
+
+    <parent>
+        <groupId>com.intuit.tsheets</groupId>
+        <artifactId>tsheets-parent</artifactId>
+        <version>0.0.1-SNAPSHOT</version>
+    </parent>
+
+    <artifactId>tsheets-examples</artifactId>
+    <name>TSheets Examples</name>
+    <description>Example application using the TSheets Core module</description>
+
+    <dependencies>
+        <dependency>
+            <groupId>org.springframework.boot</groupId>
+            <artifactId>spring-boot-starter</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>com.intuit.tsheets</groupId>
+            <artifactId>tsheets-core</artifactId>
+            <version>${project.version}</version>
+        </dependency>
+    </dependencies>
+
+</project>
+#END_FILE
+
+#BEGIN_FILE: tsheets-examples/src/main/java/com/intuit/tsheets/example/ExampleApplication.java
+package com.intuit.tsheets.example;
+
+import org.springframework.boot.SpringApplication;
+import org.springframework.boot.autoconfigure.SpringBootApplication;
+
+@SpringBootApplication
+public class ExampleApplication {
+    public static void main(String[] args) {
+        SpringApplication.run(ExampleApplication.class, args);
+    }
+}
+#END_FILE
+
+#BEGIN_FILE: tsheets-tests/pom.xml
+<?xml version="1.0" encoding="UTF-8"?>
+<project xmlns="http://maven.apache.org/POM/4.0.0"
+         xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+    <modelVersion>4.0.0</modelVersion>
+
+    <parent>
+        <groupId>com.intuit.tsheets</groupId>
+        <artifactId>tsheets-parent</artifactId>
+        <version>0.0.1-SNAPSHOT</version>
+    </parent>
+
+    <artifactId>tsheets-tests</artifactId>
+    <name>TSheets Tests</name>
+    <description>Test module for TSheets Core</description>
+
+    <dependencies>
+        <dependency>
+            <groupId>com.intuit.tsheets</groupId>
+            <artifactId>tsheets-core</artifactId>
+            <version>${project.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>org.springframework.boot</groupId>
+            <artifactId>spring-boot-starter-test</artifactId>
+            <scope>test</scope>
+        </dependency>
+    </dependencies>
+
+    <build>
+        <plugins>
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-surefire-plugin</artifactId>
+                <configuration>
+                    <useModulePath>false</useModulePath>
+                </configuration>
+            </plugin>
+        </plugins>
+    </build>
+
+</project>
+#END_FILE
+
+#BEGIN_FILE: tsheets-tests/src/test/java/com/intuit/tsheets/SanityTest.java
+package com.intuit.tsheets;
+
+import org.junit.jupiter.api.Test;
+import static org.junit.jupiter.api.Assertions.assertTrue;
+
+class SanityTest {
+    @Test
+    void sanity() {
+        assertTrue(true);
+    }
+}
+#END_FILE

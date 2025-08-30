@@ -1,0 +1,27 @@
+{
+  "groups": [
+    {
+      "name": "tsheets",
+      "type": "com.intuit.tsheets.config.DataServiceProperties",
+      "sourceType": "com.intuit.tsheets.config.DataServiceProperties"
+    }
+  ],
+  "properties": [
+    {
+      "name": "tsheets.auth-token",
+      "type": "java.lang.String",
+      "sourceType": "com.intuit.tsheets.config.DataServiceProperties"
+    },
+    {
+      "name": "tsheets.base-url",
+      "type": "java.lang.String",
+      "sourceType": "com.intuit.tsheets.config.DataServiceProperties"
+    },
+    {
+      "name": "tsheets.managed-client-id",
+      "type": "java.lang.Long",
+      "sourceType": "com.intuit.tsheets.config.DataServiceProperties"
+    }
+  ],
+  "hints": []
+}
