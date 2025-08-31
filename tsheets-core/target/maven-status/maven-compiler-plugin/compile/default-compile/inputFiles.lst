@@ -1,2 +1,16 @@
+D:\qbTime\TSheets-V1-Java-SDK\tsheets-core\src\main\java\com\intuit\tsheets\model\User.java
+D:\qbTime\TSheets-V1-Java-SDK\tsheets-core\src\main\java\com\intuit\tsheets\model\UsersResponse.java
+D:\qbTime\TSheets-V1-Java-SDK\tsheets-core\src\main\java\com\intuit\tsheets\client\EndpointName.java
+D:\qbTime\TSheets-V1-Java-SDK\tsheets-core\src\main\java\com\intuit\tsheets\client\EndpointMapper.java
+D:\qbTime\TSheets-V1-Java-SDK\tsheets-core\src\main\java\com\intuit\tsheets\api\DataService.java
+D:\qbTime\TSheets-V1-Java-SDK\tsheets-core\src\main\java\com\intuit\tsheets\pipeline\elements\SerializationElement.java
+D:\qbTime\TSheets-V1-Java-SDK\tsheets-core\src\main\java\com\intuit\tsheets\client\RestClient.java
+D:\qbTime\TSheets-V1-Java-SDK\tsheets-core\src\main\java\com\intuit\tsheets\client\ResilientRestClient.java
+D:\qbTime\TSheets-V1-Java-SDK\tsheets-core\src\main\java\com\intuit\tsheets\pipeline\elements\HttpExecutionElement.java
+D:\qbTime\TSheets-V1-Java-SDK\tsheets-core\src\main\java\com\intuit\tsheets\pipeline\PipelineContext.java
 D:\qbTime\TSheets-V1-Java-SDK\tsheets-core\src\main\java\com\intuit\tsheets\config\DataServiceProperties.java
-D:\qbTime\TSheets-V1-Java-SDK\tsheets-core\src\main\java\com\intuit\tsheets\config\CoreAutoConfiguration.java
+D:\qbTime\TSheets-V1-Java-SDK\tsheets-core\src\main\java\com\intuit\tsheets\config\TSheetsAutoConfiguration.java
+D:\qbTime\TSheets-V1-Java-SDK\tsheets-core\src\main\java\com\intuit\tsheets\pipeline\elements\DeserializationElement.java
+D:\qbTime\TSheets-V1-Java-SDK\tsheets-core\src\main\java\com\intuit\tsheets\pipeline\elements\ValidationElement.java
+D:\qbTime\TSheets-V1-Java-SDK\tsheets-core\src\main\java\com\intuit\tsheets\pipeline\RequestPipeline.java
+D:\qbTime\TSheets-V1-Java-SDK\tsheets-core\src\main\java\com\intuit\tsheets\pipeline\PipelineElement.java

@@ -6,6 +6,8 @@ import com.intuit.tsheets.client.ResilientRestClient;
 import com.intuit.tsheets.config.DataServiceProperties;
 import com.intuit.tsheets.model.User;
 import com.intuit.tsheets.model.UsersResponse;
+import com.intuit.tsheets.model.Timesheet;
+import com.intuit.tsheets.model.TimesheetsResponse;
 import com.intuit.tsheets.pipeline.PipelineContext;
 import com.intuit.tsheets.pipeline.RequestPipeline;
 import com.intuit.tsheets.pipeline.elements.DeserializationElement;
@@ -42,5 +44,18 @@ public class DataService {
         pipeline.execute(context);
         UsersResponse response = context.getResult();
         return response != null ? response.getUsers() : Collections.emptyList();
+    }
+
+    public List<Timesheet> getTimesheets() {
+        PipelineContext<TimesheetsResponse> context = new PipelineContext<>(EndpointName.TIMESHEETS, HttpMethod.GET, TimesheetsResponse.class);
+        RequestPipeline pipeline = new RequestPipeline(Arrays.asList(
+            new ValidationElement(),
+            new SerializationElement(),
+            new HttpExecutionElement(restClient, endpointMapper),
+            new DeserializationElement()
+        ));
+        pipeline.execute(context);
+        TimesheetsResponse response = context.getResult();
+        return response != null ? response.getTimesheets() : Collections.emptyList();
     }
 }

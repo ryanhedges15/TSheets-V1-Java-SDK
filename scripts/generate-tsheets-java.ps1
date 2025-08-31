@@ -1,4 +1,20 @@
-#BEGIN_FILE: pom.xml
+Param(
+  [string]$Target = "."
+)
+
+$ErrorActionPreference = "Stop"
+
+function Write-File($Path, $Content) {
+  $full = Join-Path -Path (Resolve-Path $Target) -ChildPath $Path
+  $dir = Split-Path -Path $full -Parent
+  if (-not (Test-Path $dir)) { New-Item -ItemType Directory -Path $dir -Force | Out-Null }
+  [System.IO.File]::WriteAllText($full, $Content, [System.Text.Encoding]::UTF8)
+  Write-Host "Wrote" $Path
+}
+
+$files = @()
+
+$files += [pscustomobject]@{ Path = "pom.xml"; Content = @'
 <?xml version="1.0" encoding="UTF-8"?>
 <project xmlns="http://maven.apache.org/POM/4.0.0"
          xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
@@ -40,9 +56,9 @@
         </dependencies>
     </dependencyManagement>
 </project>
-#END_FILE
+'@ }
 
-#BEGIN_FILE: tsheets-core/pom.xml
+$files += [pscustomobject]@{ Path = "tsheets-core/pom.xml"; Content = @'
 <?xml version="1.0" encoding="UTF-8"?>
 <project xmlns="http://maven.apache.org/POM/4.0.0"
          xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
@@ -89,9 +105,9 @@
     </dependencies>
 
 </project>
-#END_FILE
+'@ }
 
-#BEGIN_FILE: tsheets-core/src/main/java/com/intuit/tsheets/config/DataServiceProperties.java
+$files += [pscustomobject]@{ Path = "tsheets-core/src/main/java/com/intuit/tsheets/config/DataServiceProperties.java"; Content = @'
 package com.intuit.tsheets.config;
 
 import org.springframework.boot.context.properties.ConfigurationProperties;
@@ -127,9 +143,9 @@ public class DataServiceProperties {
         this.managedClientId = managedClientId;
     }
 }
-#END_FILE
+'@ }
 
-#BEGIN_FILE: tsheets-core/src/main/java/com/intuit/tsheets/config/TSheetsAutoConfiguration.java
+$files += [pscustomobject]@{ Path = "tsheets-core/src/main/java/com/intuit/tsheets/config/TSheetsAutoConfiguration.java"; Content = @'
 package com.intuit.tsheets.config;
 
 import org.springframework.boot.context.properties.EnableConfigurationProperties;
@@ -141,119 +157,15 @@ import org.springframework.context.annotation.Configuration;
 @EnableConfigurationProperties(DataServiceProperties.class)
 public class TSheetsAutoConfiguration {
 }
-#END_FILE
 
-#BEGIN_FILE: tsheets-core/src/main/resources/META-INF/spring.factories
+'@ }
+
+$files += [pscustomobject]@{ Path = "tsheets-core/src/main/resources/META-INF/spring.factories"; Content = @'
 org.springframework.boot.autoconfigure.EnableAutoConfiguration=\
 com.intuit.tsheets.config.TSheetsAutoConfiguration
-#END_FILE
+'@ }
 
-#BEGIN_FILE: tsheets-examples/pom.xml
-<?xml version="1.0" encoding="UTF-8"?>
-<project xmlns="http://maven.apache.org/POM/4.0.0"
-         xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
-    <modelVersion>4.0.0</modelVersion>
-
-    <parent>
-        <groupId>com.intuit.tsheets</groupId>
-        <artifactId>tsheets-parent</artifactId>
-        <version>0.0.1-SNAPSHOT</version>
-    </parent>
-
-    <artifactId>tsheets-examples</artifactId>
-    <name>TSheets Examples</name>
-    <description>Example application using the TSheets Core module</description>
-
-    <dependencies>
-        <dependency>
-            <groupId>org.springframework.boot</groupId>
-            <artifactId>spring-boot-starter</artifactId>
-        </dependency>
-        <dependency>
-            <groupId>com.intuit.tsheets</groupId>
-            <artifactId>tsheets-core</artifactId>
-            <version>${project.version}</version>
-        </dependency>
-    </dependencies>
-
-</project>
-#END_FILE
-
-#BEGIN_FILE: tsheets-examples/src/main/java/com/intuit/tsheets/example/ExampleApplication.java
-package com.intuit.tsheets.example;
-
-import org.springframework.boot.SpringApplication;
-import org.springframework.boot.autoconfigure.SpringBootApplication;
-
-@SpringBootApplication
-public class ExampleApplication {
-    public static void main(String[] args) {
-        SpringApplication.run(ExampleApplication.class, args);
-    }
-}
-#END_FILE
-
-#BEGIN_FILE: tsheets-tests/pom.xml
-<?xml version="1.0" encoding="UTF-8"?>
-<project xmlns="http://maven.apache.org/POM/4.0.0"
-         xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
-    <modelVersion>4.0.0</modelVersion>
-
-    <parent>
-        <groupId>com.intuit.tsheets</groupId>
-        <artifactId>tsheets-parent</artifactId>
-        <version>0.0.1-SNAPSHOT</version>
-    </parent>
-
-    <artifactId>tsheets-tests</artifactId>
-    <name>TSheets Tests</name>
-    <description>Test module for TSheets Core</description>
-
-    <dependencies>
-        <dependency>
-            <groupId>com.intuit.tsheets</groupId>
-            <artifactId>tsheets-core</artifactId>
-            <version>${project.version}</version>
-        </dependency>
-        <dependency>
-            <groupId>org.springframework.boot</groupId>
-            <artifactId>spring-boot-starter-test</artifactId>
-            <scope>test</scope>
-        </dependency>
-    </dependencies>
-
-    <build>
-        <plugins>
-            <plugin>
-                <groupId>org.apache.maven.plugins</groupId>
-                <artifactId>maven-surefire-plugin</artifactId>
-                <configuration>
-                    <useModulePath>false</useModulePath>
-                </configuration>
-            </plugin>
-        </plugins>
-    </build>
-
-</project>
-#END_FILE
-
-#BEGIN_FILE: tsheets-tests/src/test/java/com/intuit/tsheets/SanityTest.java
-package com.intuit.tsheets;
-
-import org.junit.jupiter.api.Test;
-import static org.junit.jupiter.api.Assertions.assertTrue;
-
-class SanityTest {
-    @Test
-    void sanity() {
-        assertTrue(true);
-    }
-}
-#END_FILE
-
-#BEGIN_FILE: tsheets-core/src/main/java/com/intuit/tsheets/client/RestClient.java
+$files += [pscustomobject]@{ Path = "tsheets-core/src/main/java/com/intuit/tsheets/client/RestClient.java"; Content = @'
 package com.intuit.tsheets.client;
 
 import com.intuit.tsheets.config.DataServiceProperties;
@@ -309,9 +221,9 @@ public class RestClient {
         return restTemplate.exchange(url(path), HttpMethod.DELETE, new HttpEntity<>(defaultHeaders()), String.class);
     }
 }
-#END_FILE
+'@ }
 
-#BEGIN_FILE: tsheets-core/src/main/java/com/intuit/tsheets/client/ResilientRestClient.java
+$files += [pscustomobject]@{ Path = "tsheets-core/src/main/java/com/intuit/tsheets/client/ResilientRestClient.java"; Content = @'
 package com.intuit.tsheets.client;
 
 import java.util.Collections;
@@ -363,18 +275,18 @@ public class ResilientRestClient {
         return retryTemplate.execute(context -> restClient.delete(path));
     }
 }
-#END_FILE
+'@ }
 
-#BEGIN_FILE: tsheets-core/src/main/java/com/intuit/tsheets/client/EndpointName.java
+$files += [pscustomobject]@{ Path = "tsheets-core/src/main/java/com/intuit/tsheets/client/EndpointName.java"; Content = @'
 package com.intuit.tsheets.client;
 
 public enum EndpointName {
     USERS,
     TIMESHEETS;
 }
-#END_FILE
+'@ }
 
-#BEGIN_FILE: tsheets-core/src/main/java/com/intuit/tsheets/client/EndpointMapper.java
+$files += [pscustomobject]@{ Path = "tsheets-core/src/main/java/com/intuit/tsheets/client/EndpointMapper.java"; Content = @'
 package com.intuit.tsheets.client;
 
 import java.util.EnumMap;
@@ -395,9 +307,9 @@ public class EndpointMapper {
         return mapping.get(name);
     }
 }
-#END_FILE
+'@ }
 
-#BEGIN_FILE: tsheets-core/src/main/java/com/intuit/tsheets/pipeline/PipelineElement.java
+$files += [pscustomobject]@{ Path = "tsheets-core/src/main/java/com/intuit/tsheets/pipeline/PipelineElement.java"; Content = @'
 package com.intuit.tsheets.pipeline;
 
 /**
@@ -413,9 +325,35 @@ public interface PipelineElement {
     void process(PipelineContext<?> context);
 }
 
-#END_FILE
+'@ }
 
-#BEGIN_FILE: tsheets-core/src/main/java/com/intuit/tsheets/pipeline/PipelineContext.java
+$files += [pscustomobject]@{ Path = "tsheets-core/src/main/java/com/intuit/tsheets/pipeline/RequestPipeline.java"; Content = @'
+package com.intuit.tsheets.pipeline;
+
+import java.util.List;
+
+public class RequestPipeline {
+
+    private final List<PipelineElement> elements;
+
+    public RequestPipeline(List<PipelineElement> elements) {
+        this.elements = elements;
+    }
+
+    /**
+     * Execute the pipeline against the provided context.
+     *
+     * @param context the context carrying request and response information
+     */
+    public void execute(PipelineContext<?> context) {
+        for (PipelineElement element : elements) {
+            element.process(context);
+        }
+    }
+}
+'@ }
+
+$files += [pscustomobject]@{ Path = "tsheets-core/src/main/java/com/intuit/tsheets/pipeline/PipelineContext.java"; Content = @'
 package com.intuit.tsheets.pipeline;
 
 import com.intuit.tsheets.client.EndpointName;
@@ -495,35 +433,9 @@ public class PipelineContext<T> {
         this.status = status;
     }
 }
-#END_FILE
+'@ }
 
-#BEGIN_FILE: tsheets-core/src/main/java/com/intuit/tsheets/pipeline/RequestPipeline.java
-package com.intuit.tsheets.pipeline;
-
-import java.util.List;
-
-public class RequestPipeline {
-
-    private final List<PipelineElement> elements;
-
-    public RequestPipeline(List<PipelineElement> elements) {
-        this.elements = elements;
-    }
-
-    /**
-     * Execute the pipeline against the provided context.
-     *
-     * @param context the context carrying request and response information
-     */
-    public void execute(PipelineContext<?> context) {
-        for (PipelineElement element : elements) {
-            element.process(context);
-        }
-    }
-}
-#END_FILE
-
-#BEGIN_FILE: tsheets-core/src/main/java/com/intuit/tsheets/pipeline/elements/ValidationElement.java
+$files += [pscustomobject]@{ Path = "tsheets-core/src/main/java/com/intuit/tsheets/pipeline/elements/ValidationElement.java"; Content = @'
 package com.intuit.tsheets.pipeline.elements;
 
 import com.intuit.tsheets.pipeline.PipelineContext;
@@ -537,9 +449,9 @@ public class ValidationElement implements PipelineElement {
     }
 }
 
-#END_FILE
+'@ }
 
-#BEGIN_FILE: tsheets-core/src/main/java/com/intuit/tsheets/pipeline/elements/SerializationElement.java
+$files += [pscustomobject]@{ Path = "tsheets-core/src/main/java/com/intuit/tsheets/pipeline/elements/SerializationElement.java"; Content = @'
 package com.intuit.tsheets.pipeline.elements;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
@@ -566,9 +478,9 @@ public class SerializationElement implements PipelineElement {
         }
     }
 }
-#END_FILE
+'@ }
 
-#BEGIN_FILE: tsheets-core/src/main/java/com/intuit/tsheets/pipeline/elements/HttpExecutionElement.java
+$files += [pscustomobject]@{ Path = "tsheets-core/src/main/java/com/intuit/tsheets/pipeline/elements/HttpExecutionElement.java"; Content = @'
 package com.intuit.tsheets.pipeline.elements;
 
 import com.intuit.tsheets.client.EndpointMapper;
@@ -606,9 +518,9 @@ public class HttpExecutionElement implements PipelineElement {
         context.setStatus(response.getStatusCode());
     }
 }
-#END_FILE
+'@ }
 
-#BEGIN_FILE: tsheets-core/src/main/java/com/intuit/tsheets/pipeline/elements/DeserializationElement.java
+$files += [pscustomobject]@{ Path = "tsheets-core/src/main/java/com/intuit/tsheets/pipeline/elements/DeserializationElement.java"; Content = @'
 package com.intuit.tsheets.pipeline.elements;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -639,9 +551,9 @@ public class DeserializationElement implements PipelineElement {
         }
     }
 }
-#END_FILE
+'@ }
 
-#BEGIN_FILE: tsheets-core/src/main/java/com/intuit/tsheets/model/User.java
+$files += [pscustomobject]@{ Path = "tsheets-core/src/main/java/com/intuit/tsheets/model/User.java"; Content = @'
 package com.intuit.tsheets.model;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
@@ -870,9 +782,10 @@ public class User {
         return companyName;
     }
 }
-#END_FILE
 
-#BEGIN_FILE: tsheets-core/src/main/java/com/intuit/tsheets/model/UsersResponse.java
+'@ }
+
+$files += [pscustomobject]@{ Path = "tsheets-core/src/main/java/com/intuit/tsheets/model/UsersResponse.java"; Content = @'
 package com.intuit.tsheets.model;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
@@ -894,9 +807,10 @@ public class UsersResponse {
         this.users = users;
     }
 }
-#END_FILE
+'
+@ }
 
-#BEGIN_FILE: tsheets-core/src/main/java/com/intuit/tsheets/model/Timesheet.java
+$files += [pscustomobject]@{ Path = "tsheets-core/src/main/java/com/intuit/tsheets/model/Timesheet.java"; Content = @'
 package com.intuit.tsheets.model;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
@@ -924,9 +838,10 @@ public class Timesheet {
         this.userId = userId;
     }
 }
-#END_FILE
 
-#BEGIN_FILE: tsheets-core/src/main/java/com/intuit/tsheets/model/TimesheetsResponse.java
+'@ }
+
+$files += [pscustomobject]@{ Path = "tsheets-core/src/main/java/com/intuit/tsheets/model/TimesheetsResponse.java"; Content = @'
 package com.intuit.tsheets.model;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
@@ -945,9 +860,10 @@ public class TimesheetsResponse {
         this.timesheets = timesheets;
     }
 }
-#END_FILE
 
-#BEGIN_FILE: tsheets-core/src/main/java/com/intuit/tsheets/api/DataService.java
+'@ }
+
+$files += [pscustomobject]@{ Path = "tsheets-core/src/main/java/com/intuit/tsheets/api/DataService.java"; Content = @'
 package com.intuit.tsheets.api;
 
 import com.intuit.tsheets.client.EndpointMapper;
@@ -1009,9 +925,9 @@ public class DataService {
         return response != null ? response.getTimesheets() : Collections.emptyList();
     }
 }
-#END_FILE
+'@ }
 
-#BEGIN_FILE: .github/workflows/build.yml
+$files += [pscustomobject]@{ Path = ".github/workflows/build.yml"; Content = @'
 name: Build
 
 on:
@@ -1032,4 +948,115 @@ jobs:
           java-version: '11'
       - name: Build with Maven
         run: mvn -q -e install
-#END_FILE
+'@ }
+
+$files += [pscustomobject]@{ Path = "tsheets-examples/pom.xml"; Content = @'
+<?xml version="1.0" encoding="UTF-8"?>
+<project xmlns="http://maven.apache.org/POM/4.0.0"
+         xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+    <modelVersion>4.0.0</modelVersion>
+
+    <parent>
+        <groupId>com.intuit.tsheets</groupId>
+        <artifactId>tsheets-parent</artifactId>
+        <version>0.0.1-SNAPSHOT</version>
+    </parent>
+
+    <artifactId>tsheets-examples</artifactId>
+    <name>TSheets Examples</name>
+    <description>Example application using the TSheets Core module</description>
+
+    <dependencies>
+        <dependency>
+            <groupId>org.springframework.boot</groupId>
+            <artifactId>spring-boot-starter</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>com.intuit.tsheets</groupId>
+            <artifactId>tsheets-core</artifactId>
+            <version>${project.version}</version>
+        </dependency>
+    </dependencies>
+
+</project>
+'@ }
+
+$files += [pscustomobject]@{ Path = "tsheets-examples/src/main/java/com/intuit/tsheets/example/ExampleApplication.java"; Content = @'
+package com.intuit.tsheets.example;
+
+import org.springframework.boot.SpringApplication;
+import org.springframework.boot.autoconfigure.SpringBootApplication;
+
+@SpringBootApplication
+public class ExampleApplication {
+    public static void main(String[] args) {
+        SpringApplication.run(ExampleApplication.class, args);
+    }
+}
+'@ }
+
+$files += [pscustomobject]@{ Path = "tsheets-tests/pom.xml"; Content = @'
+<?xml version="1.0" encoding="UTF-8"?>
+<project xmlns="http://maven.apache.org/POM/4.0.0"
+         xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+    <modelVersion>4.0.0</modelVersion>
+
+    <parent>
+        <groupId>com.intuit.tsheets</groupId>
+        <artifactId>tsheets-parent</artifactId>
+        <version>0.0.1-SNAPSHOT</version>
+    </parent>
+
+    <artifactId>tsheets-tests</artifactId>
+    <name>TSheets Tests</name>
+    <description>Test module for TSheets Core</description>
+
+    <dependencies>
+        <dependency>
+            <groupId>com.intuit.tsheets</groupId>
+            <artifactId>tsheets-core</artifactId>
+            <version>${project.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>org.springframework.boot</groupId>
+            <artifactId>spring-boot-starter-test</artifactId>
+            <scope>test</scope>
+        </dependency>
+    </dependencies>
+
+    <build>
+        <plugins>
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-surefire-plugin</artifactId>
+                <configuration>
+                    <useModulePath>false</useModulePath>
+                </configuration>
+            </plugin>
+        </plugins>
+    </build>
+
+</project>
+'@ }
+
+$files += [pscustomobject]@{ Path = "tsheets-tests/src/test/java/com/intuit/tsheets/SanityTest.java"; Content = @'
+package com.intuit.tsheets;
+
+import org.junit.jupiter.api.Test;
+import static org.junit.jupiter.api.Assertions.assertTrue;
+
+class SanityTest {
+    @Test
+    void sanity() {
+        assertTrue(true);
+    }
+}
+'@ }
+
+foreach ($f in $files) { Write-File -Path $f.Path -Content $f.Content }
+
+Write-Host "All files generated in" (Resolve-Path $Target)
+Write-Host "Next: mvn -q -e install"
+
