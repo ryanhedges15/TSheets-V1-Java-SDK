@@ -370,7 +370,8 @@ package com.intuit.tsheets.client;
 
 public enum EndpointName {
     USERS,
-    TIMESHEETS;
+    TIMESHEETS,
+    JOBCODES;
 }
 #END_FILE
 
@@ -389,11 +390,44 @@ public class EndpointMapper {
     public EndpointMapper() {
         mapping.put(EndpointName.USERS, "/users");
         mapping.put(EndpointName.TIMESHEETS, "/timesheets");
+        mapping.put(EndpointName.JOBCODES, "/jobcodes");
     }
 
     public String map(EndpointName name) {
         return mapping.get(name);
     }
+}
+#END_FILE
+
+#BEGIN_FILE: tsheets-core/src/main/java/com/intuit/tsheets/model/Jobcode.java
+package com.intuit.tsheets.model;
+
+import com.fasterxml.jackson.annotation.JsonProperty;
+
+public class Jobcode {
+    private long id;
+    @JsonProperty("name") private String name;
+    @JsonProperty("connect_with_quickbooks") private Boolean connectWithQuickBooks;
+    public long getId() { return id; }
+    public void setId(long id) { this.id = id; }
+    public String getName() { return name; }
+    public void setName(String name) { this.name = name; }
+    public Boolean getConnectWithQuickBooks() { return connectWithQuickBooks; }
+    public void setConnectWithQuickBooks(Boolean v) { this.connectWithQuickBooks = v; }
+}
+#END_FILE
+
+#BEGIN_FILE: tsheets-core/src/main/java/com/intuit/tsheets/model/JobcodesResponse.java
+package com.intuit.tsheets.model;
+
+import com.fasterxml.jackson.annotation.JsonProperty;
+import java.util.List;
+
+public class JobcodesResponse {
+    @JsonProperty("jobcodes")
+    private List<Jobcode> jobcodes;
+    public List<Jobcode> getJobcodes() { return jobcodes; }
+    public void setJobcodes(List<Jobcode> jobcodes) { this.jobcodes = jobcodes; }
 }
 #END_FILE
 
@@ -956,6 +990,8 @@ import com.intuit.tsheets.client.ResilientRestClient;
 import com.intuit.tsheets.config.DataServiceProperties;
 import com.intuit.tsheets.model.User;
 import com.intuit.tsheets.model.UsersResponse;
+import com.intuit.tsheets.model.Jobcode;
+import com.intuit.tsheets.model.JobcodesResponse;
 import com.intuit.tsheets.model.Timesheet;
 import com.intuit.tsheets.model.TimesheetsResponse;
 import com.intuit.tsheets.pipeline.PipelineContext;
@@ -1008,7 +1044,20 @@ public class DataService {
         TimesheetsResponse response = context.getResult();
         return response != null ? response.getTimesheets() : Collections.emptyList();
     }
-}
+    }
+
+    public List<Jobcode> getJobcodes() {
+        PipelineContext<JobcodesResponse> context = new PipelineContext<>(EndpointName.JOBCODES, HttpMethod.GET, JobcodesResponse.class);
+        RequestPipeline pipeline = new RequestPipeline(Arrays.asList(
+            new ValidationElement(),
+            new SerializationElement(),
+            new HttpExecutionElement(restClient, endpointMapper),
+            new DeserializationElement()
+        ));
+        pipeline.execute(context);
+        JobcodesResponse response = context.getResult();
+        return response != null ? response.getJobcodes() : Collections.emptyList();
+    }
 #END_FILE
 
 #BEGIN_FILE: .github/workflows/build.yml
